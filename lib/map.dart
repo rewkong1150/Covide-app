@@ -1,10 +1,15 @@
+import 'package:GoogleMaps/models/task.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:GoogleMaps/models/profile.dart';
 
 
 class MapsPage extends StatefulWidget {
+  MapsPage(Task3 task);
+
   @override
   _MapsPageState createState() => _MapsPageState();
 }
@@ -13,16 +18,18 @@ class _MapsPageState extends State<MapsPage> {
   GoogleMapController mapController;
    final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final firestoreInstance = FirebaseFirestore.instance;
- 
-
+  final auth = FirebaseAuth.instance;
+ final formKey = GlobalKey<FormState>();
+  Profile profile = Profile();
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
   
 
-void _create() async {
+void _create() 
+async {
     try {
-      await firestore.collection('users').doc('testUser').set(
+      await firestore.collection(auth.currentUser.email).doc(profile.name).set(
           {
             'latitude': userLocation.latitude,
             'longtitude': userLocation.longitude ,
@@ -88,7 +95,7 @@ void _create() async {
               return AlertDialog(
                 content: Text(
                     'Your location has been send !\nlat: ${userLocation.latitude} long: ${userLocation.longitude}(${now.day}/${now.month}/${now.year}Time:${now.hour}:${now.minute}) '),
-                    
+                     
                     
               );
            

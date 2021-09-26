@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:330410268176:android:8bd073f2c7f423cf6b9c95",
         "android_client_info": {
-          "package_name": "com.example.GoogleMaps"
+          "package_name": "com.example.flutter_app"
         }
       },
       "oauth_client": [

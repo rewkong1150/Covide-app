@@ -3,48 +3,39 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 
+import 'models/task.dart';
+
+final String jsonplaceholder = "http://jsonplaceholder.typicode.com/users/";
 Future<Covid> fetchData() async {
-  var url = "covid19.th-stat.com";
-  var response = await http.get(Uri.https(url, "api/open/today"));
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    // return Covid.fromJson(jsonDecode(response.body));
-    return Covid.fromJson(jsonDecode(response.body));
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load album');
-  }
+
+    final response = await http.get(Uri.parse('https://covid19.ddc.moph.go.th/api/Cases/today-cases-all'));
+  final jsonresponse = json.decode(response.body);
+    // print(jsonDecode(response.body[0]));
+    return Covid.fromJson(jsonresponse[0]);
+
 }
 
 class Covid {
-  final int confirmed;
-  final int deaths;
-  final int newConfirmed;
-  final int newDeaths;
-  final String updateDate;
+  final String txn_date;
+  final int new_case;
+  final int total_case;
+  final String update_date;
 
-  Covid(
-      {this.confirmed,
-      this.deaths,
-      this.newConfirmed,
-      this.newDeaths,
-      this.updateDate});
+  Covid({this.txn_date, this.new_case, this.total_case, this.update_date});
 
   factory Covid.fromJson(Map<String, dynamic> json) {
     return Covid(
-       confirmed: json["Confirmed"] == null ? null : json["Confirmed"],
-       deaths: json["Deaths"] == null ? null : json["Deaths"],
-       newConfirmed: json["NewConfirmed"] == null ? null : json["NewConfirmed"],
-      newDeaths: json["NewDeaths"] == null ? null : json["NewDeaths"],
-       updateDate: json["UpdateDate"] == null ? null : json["UpdateDate"]
+      txn_date: json["txn_date"] == null ? null : json["txn_date"],
+      new_case: json["new_case"] == null ? null : json["new_case"],
+      total_case: json["total_case"] == null ? null : json["total_case"],
+      update_date: json["update_date"] == null ? null : json["update_date"],
     );
   }
 }
-// Confirmed,Deaths,NewConfirmed,NewDeaths,UpdateDate
-
+ 
 class Check extends StatefulWidget {
+   final Task task;
+  Check(this.task);
   @override
   _CheckcState createState() => _CheckcState();
 }
@@ -74,14 +65,22 @@ class _CheckcState extends State<Check> {
             future: futureAlbum,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
+                print(snapshot.data);
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children:[
-                    Text("Confirmed: ${snapshot.data.confirmed.toString()}",style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                    Text("Deaths: ${snapshot.data.deaths.toString()}",style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                    Text("newConfirmed: ${snapshot.data.newConfirmed.toString()}",style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                    Text("newDeaths: ${snapshot.data.newDeaths.toString()}",style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                    Text("updateDate: ${snapshot.data.updateDate.toString()}",style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  children: [
+                    Text("วันที่: ${snapshot.data.txn_date.toString()}",
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold)),
+                    Text("ผู้ป่วยใหม่: ${snapshot.data.new_case.toString()}",
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold)),
+                    Text("ผู้ป่วยสะสม ${snapshot.data.total_case.toString()}",
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold)),
+                    Text("อัพเดทวันที่: ${snapshot.data.update_date.toString()}",
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold)),
                   ],
                 );
               } else if (snapshot.hasError) {
@@ -96,6 +95,4 @@ class _CheckcState extends State<Check> {
       ),
     );
   }
-  
 }
-  
